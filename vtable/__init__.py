@@ -4,6 +4,7 @@ The VTable class is used to create a 2 dimensional matrix which can be used to s
   referenced by their column and row names.
 Think of the VTable object like a BINGO sheet, to reference the cell value you would use table_variable['B', '3']
 """
+import json
 
 
 class VRow(object):
@@ -66,7 +67,9 @@ class VRow(object):
             the row's column's value.
         :return:
         """
-        return {k: v['value'] for k, v in self._d.items()}
+        d = {k: v['value'] for k, v in self._d.items()}
+        d.update({'_index': self.index})
+        return d
 
     def as_text(self, delim, none_value_replacement=''):
         """
@@ -226,6 +229,37 @@ class VTable(object):
             raise AttributeError("Attempted to overwrite row header.")
         self.table_data[row_header][column_header] = value
 
+    def json_serialize(self):
+        """
+        Serialize the table to a json format to be reopened with from_serialized_json().
+        :return:
+        """
+        table_data = {}
+        for k, v in self.table_data.items():
+            table_data[k] = v.as_dict()
+        d = {'table_data': table_data, 'row_headers': self.row_headers, 'column_headers': self.column_headers}
+        return json.dumps(d)
+
+    @classmethod
+    def from_serialized_json(cls, json_string):
+        d = json.loads(json_string)
+        column_headers = d['column_headers']
+        row_headers = d['row_headers']
+        table_data = d['table_data']
+        td = {}
+        for k, v in table_data.items():
+            td[k] = VRow(column_headers, k)
+            for k1, v1 in v.items():
+                if k1 == '_index':
+                    td[k].index = v1
+                    continue
+                td[k][k1] = v1
+        table = cls('', '')
+        table.column_headers = column_headers
+        table.row_headers = row_headers
+        table.table_data = td
+        return table
+
     def __getitem__(self, item):
         column_header = item[0]
         row_header = item[1]
@@ -256,6 +290,10 @@ def run_test():
         print row
         for column in row:
             print column
+
+    # Dump and load to/from json
+    tbl = table.from_serialized_json(table.json_serialize())
+    print tbl.export('\t')
 
 
 if __name__ == '__main__':
