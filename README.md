@@ -2,6 +2,8 @@
 
 This module is a simple 2D dictionary wrapper used to create an excel like table in python.
 
+Note: This module is made for sellercentral.amazon.com's FBA shipment packing list. I've tried to keep it as scalable as possible though for use with multiple applications.
+
 # Usage
 
 ```python
