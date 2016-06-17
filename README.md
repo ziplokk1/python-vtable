@@ -27,3 +27,8 @@ Row headers must be unique just like column headers in SQL
 
 * Allow multiple row headers
 * Add loading of flat files
+
+# Installation
+
+* Clone the repository to your local machine
+* `pip install -e /path/to/local/folder/vtable`
