@@ -260,6 +260,23 @@ class VTable(object):
         table.table_data = td
         return table
 
+    @classmethod
+    def load_flat_file(cls, file_contents, delim):
+        lines = [y.split(delim) for y in [x.strip('\r') for x in file_contents.split('\n')]]
+        column_headers = lines.pop(0)
+        row_headers = [x[0] for x in lines]
+        td = {}
+        for i, row in enumerate(lines):
+            vr = VRow(column_headers, row[0], i)
+            for header, value in zip(column_headers, row):
+                vr[header] = value
+            td[row[0]] = vr
+        table = cls('', '')
+        table.column_headers = column_headers
+        table.row_headers = row_headers
+        table.table_data = td
+        return table
+
     def __getitem__(self, item):
         column_header = item[0]
         row_header = item[1]
