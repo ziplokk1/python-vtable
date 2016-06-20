@@ -47,11 +47,7 @@ class VRow(object):
         """
         if val is None:
             return replacement
-        if isinstance(val, unicode):
-            return val.encode('utf-8')
-        if isinstance(val, str):
-            return unicode(val).encode('utf-8')
-        return unicode(val).encode('utf-8')
+        return str(val)
 
     def as_list(self):
         """
