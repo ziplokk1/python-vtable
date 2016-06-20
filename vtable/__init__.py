@@ -47,6 +47,8 @@ class VRow(object):
         """
         if val is None:
             return replacement
+        if isinstance(val, str):
+            return val
         return str(val)
 
     def as_list(self):
