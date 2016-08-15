@@ -5,6 +5,8 @@ The VTable class is used to create a 2 dimensional matrix which can be used to s
 Think of the VTable object like a BINGO sheet, to reference the cell value you would use table_variable['B', '3']
 """
 import json
+import csv
+import StringIO
 
 
 class VRow(object):
@@ -259,12 +261,11 @@ class VTable(object):
         return table
 
     @classmethod
-    def load_flat_file(cls, file_contents, delim):
-        lines = [y.split(delim) for y in [x.strip('\r') for x in file_contents.split('\n')]]
-        column_headers = lines.pop(0)
-        row_headers = [x[0] for x in lines]
+    def from_iterable(cls, iterable):
+        column_headers = iterable.pop(0)
+        row_headers = [x[0] for x in iterable]
         td = {}
-        for i, row in enumerate(lines):
+        for i, row in enumerate(iterable):
             vr = VRow(column_headers, row[0], i)
             for header, value in zip(column_headers, row):
                 vr[header] = value
@@ -274,6 +275,17 @@ class VTable(object):
         table.row_headers = row_headers
         table.table_data = td
         return table
+
+    @classmethod
+    def load_flat_file(cls, file_contents, delim):
+        lines = [y.split(delim) for y in [x.strip('\r') for x in file_contents.split('\n')]]
+        return cls.from_iterable(lines)
+
+    @classmethod
+    def load_csv(cls, file_contents, delimiter=','):
+        io = StringIO.StringIO(file_contents)
+        lines = list(csv.reader(io, delimiter=delimiter))
+        return cls.from_iterable(lines)
 
     def __getitem__(self, item):
         column_header = item[0]
